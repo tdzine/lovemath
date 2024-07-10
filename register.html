@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng ký tài khoản</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .register-container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            position: relative;
+        }
+        .register-container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .register-container h3 {
+            margin-top: 20px;
+            font-size: 18px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 5px;
+        }
+        .register-container input[type="text"],
+        .register-container input[type="password"],
+        .register-container input[type="email"],
+        .register-container textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .register-container button {
+            width: 100%;
+            padding: 10px;
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .register-container button:hover {
+            background-color: #002244;
+        }
+        .back-icon {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 24px;
+            color: #003366;
+            text-decoration: none;
+            transition: font-size 0.3s;
+        }
+        .back-icon:hover {
+            font-size: 18px;
+        }
+        .back-icon:hover::after {
+            content: "Quay về trang trước";
+            display: block;
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 5px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+            z-index: 1;
+            font-size: 14px;
+            transition: font-size 0.3s;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <!-- Liên kết quay lại trang đăng nhập -->
+        <a href="login.html" class="back-icon">&larr;</a>
+        <h2>Đăng ký tài khoản</h2>
+        <!-- Form đăng ký -->
+        <form action="register.php" method="post">
+            <input type="text" name="username" placeholder="Tên đăng nhập" required>
+            <input type="password" name="password" placeholder="Mật khẩu" required>
+			<input type="email" name="email" placeholder="Email" required>
+            <input type="text" name="parent_name" placeholder="Tên phụ huynh" required>
+            <input type="text" name="parent_phone" placeholder="Số điện thoại phụ huynh" required>
+            
+            <h3>Thông tin học sinh</h3>
+            <input type="text" name="student_name" placeholder="Tên học sinh" required>
+            <input type="text" name="class" placeholder="Lớp" required>
+            <input type="text" name="school" placeholder="Trường" required>
+            <textarea name="address" placeholder="Địa chỉ" required></textarea>
+            
+            <button type="submit">Đăng ký</button>
+        </form>
+    </div>
+</body>
+</html>

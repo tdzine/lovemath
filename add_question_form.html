@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thêm câu hỏi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        form {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+
+        .message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .message.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .message.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Thêm câu hỏi</h1>
+    </header>
+    <div id="message"></div>
+    <form id="addQuestionForm" method="POST" action="add_question.php">
+        <label for="question_type">Loại câu hỏi:</label>
+        <select id="question_type" name="question_type">
+            <option value="add">Phép cộng</option>
+            <option value="sub">Phép trừ</option>
+            <option value="comparison">Phép so sánh</option>
+        </select>
+        <div id="questionInput" style="display:none;">
+            <label for="question_text">Câu hỏi:</label>
+            <input type="text" id="question_text" name="question_text">
+            <label for="answer">Đáp án:</label>
+            <input type="number" id="answer" name="answer">
+        </div>
+        <div id="comparisonInput" style="display:none;">
+            <label for="left_operand">Toán hạng bên trái:</label>
+            <input type="number" id="left_operand" name="left_operand">
+            <label for="operator">Toán tử:</label>
+            <select id="operator" name="operator">
+                <option value="=">Bằng (=)</option>
+                <option value="!=">Khác (!=)</option>
+                <option value="<">Nhỏ hơn (&lt;)</option>
+                <option value="<=">Nhỏ hơn hoặc bằng (&lt;=)</option>
+                <option value=">">Lớn hơn (&gt;)</option>
+                <option value=">=">Lớn hơn hoặc bằng (&gt;=)</option>
+            </select>
+            <label for="right_operand">Toán hạng bên phải:</label>
+            <input type="number" id="right_operand" name="right_operand">
+        </div>
+        <button type="submit">Thêm câu hỏi</button>
+    </form>
+    <script>
+        function updateFormVisibility() {
+            var type = document.getElementById('question_type').value;
+            var questionTextInput = document.getElementById('question_text');
+            var answerInput = document.getElementById('answer');
+            var questionInputDiv = document.getElementById('questionInput');
+            var comparisonInputDiv = document.getElementById('comparisonInput');
+            
+            if (type === 'add' || type === 'sub') {
+                questionInputDiv.style.display = 'block';
+                comparisonInputDiv.style.display = 'none';
+                questionTextInput.setAttribute('required', true);
+                answerInput.setAttribute('required', true);
+            } else if (type === 'comparison') {
+                questionInputDiv.style.display = 'none';
+                comparisonInputDiv.style.display = 'block';
+                questionTextInput.removeAttribute('required');
+                answerInput.removeAttribute('required');
+            } else {
+                questionInputDiv.style.display = 'none';
+                comparisonInputDiv.style.display = 'none';
+                questionTextInput.removeAttribute('required');
+                answerInput.removeAttribute('required');
+            }
+        }
+
+        document.getElementById('question_type').addEventListener('change', updateFormVisibility);
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var success = urlParams.get('success');
+            var messageDiv = document.getElementById('message');
+            if (success !== null) {
+                if (success == '1') {
+                    messageDiv.innerHTML = '<div class="message success">Câu hỏi đã được thêm thành công!</div>';
+                } else {
+                    messageDiv.innerHTML = '<div class="message error">Có lỗi xảy ra khi thêm câu hỏi.</div>';
+                }
+            }
+            // Gọi updateFormVisibility khi trang được tải để hiển thị đúng các trường nhập liệu
+            updateFormVisibility();
+        });
+    </script>
+</body>
+</html>

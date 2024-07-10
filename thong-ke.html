@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thống kê thời gian học</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        canvas {
+            max-width: 80%;
+            margin-top: 20px;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 20px;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@2.0.0"></script>
+</head>
+<body>
+    <header>
+        <h1>Thống kê thời gian học</h1>
+    </header>
+    <main>
+        <canvas id="studyChart"></canvas>
+    </main>
+    <script>
+        function loadStudyTime() {
+            fetch('get_practice_history.php?user_id=1') // Thay đổi ID người dùng nếu cần
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data); // Thêm console.log để kiểm tra dữ liệu trả về
+                    
+                    const labels = data.map(entry => new Date(entry.end_time));
+                    const durations = data.map(entry => entry.duration / 60); // Chuyển đổi thành phút
+
+                    const ctx = document.getElementById('studyChart').getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line', // Đổi loại biểu đồ thành line
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Thời gian học (phút)',
+                                data: durations,
+                                backgroundColor: 'rgba(0, 123, 255, 0.5)',
+                                borderColor: 'rgba(0, 123, 255, 1)',
+                                borderWidth: 1,
+                                fill: true // Thiết lập để tạo diện tích dưới đường
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: 'Thời gian học (phút)'
+                                    }
+                                },
+                                x: {
+                                    type: 'time', // Thiết lập trục x là thời gian
+                                    time: {
+                                        unit: 'day', // Đơn vị hiển thị là ngày
+                                        tooltipFormat: 'dd/MM/yyyy HH:mm', // Định dạng hiển thị khi di chuột
+                                        displayFormats: {
+                                            day: 'dd/MM/yyyy' // Định dạng hiển thị trên trục x
+                                        }
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Thời gian kết thúc'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: true,
+                                    position: 'top'
+                                }
+                            }
+                        }
+                    });
+                })
+                .catch(error => {
+                    console.error('There has been a problem with your fetch operation:', error);
+                });
+        }
+
+        document.addEventListener('DOMContentLoaded', loadStudyTime);
+    </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện tập toán</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            background-color: #003366;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        nav {
+            margin-top: 20px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin-right: 20px;
+            font-size: 16px;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            padding: 20px;
+        }
+
+        #topic {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        #blocklyDiv {
+            height: 400px;
+            width: 600px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            background-color: #003366;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background-color: #002244;
+        }
+
+        #result {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            background-color: transparent;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 5px;
+        }
+
+        .back-button:hover {
+            text-decoration: underline;
+        }
+
+        .back-button i {
+            margin-right: 8px;
+            font-size: 24px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>Luyện tập toán</h1>
+        <nav>
+            <button class="back-button" onclick="window.location.href='select_topic.php'">
+                <i class="fas fa-arrow-left"></i> Quay lại
+            </button>
+        </nav>
+    </header>
+    <main>
+        <div id="topic">Chủ đề: Phép trừ</div>
+        <div id="blocklyDiv"></div>
+        <button id="checkAnswerBtn">Kiểm tra câu trả lời</button>
+        <p id="result"></p>
+    </main>
+    <script>
+        let workspace = Blockly.inject('blocklyDiv', {
+            toolbox: '<xml></xml>',
+            trashcan: false,
+            scrollbars: false
+        });
+
+        let currentQuestionIndex = 0;
+        let problems = [];
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let startTime = new Date().toISOString(); // Thời gian bắt đầu luyện tập
+        let userId;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchUserId();
+            fetchProblems();
+        });
+
+        async function fetchUserId() {
+            try {
+                const response = await fetch('get_user_id.php');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                userId = data.user_id;
+            } catch (error) {
+                console.error('Lỗi khi lấy user_id:', error);
+            }
+        }
+
+        async function fetchProblems() {
+            try {
+                const response = await fetch('get_math_problems_sub.php');
+                problems = await response.json();
+                if (problems.length > 0) {
+                    currentQuestionIndex = 0;
+                    loadQuestion(currentQuestionIndex);
+                } else {
+                    alert('Không có câu hỏi nào để hiển thị.');
+                }
+            } catch (error) {
+                console.error('Lỗi khi lấy bài tập toán:', error);
+            }
+        }
+
+        function loadQuestion(index) {
+            if (index < problems.length) {
+                const problem = problems[index];
+
+                const xmlText = `
+                    <xml xmlns="https://developers.google.com/blockly/xml">
+                        <block type="text" id="text_question" x="200" y="200">
+                            <field name="TEXT">${problem.question_text}</field>
+                        </block>
+                        <block type="math_number" id="number_answer" x="300" y="300"></block>
+                    </xml>
+                `;
+                
+                const parser = new DOMParser();
+                const xmlDoc = parser.parseFromString(xmlText, "application/xml");
+                Blockly.Xml.clearWorkspaceAndLoadFromXml(xmlDoc.documentElement, workspace);
+            } else {
+                showCompletionMessage();
+            }
+        }
+
+        function showCompletionMessage() {
+            document.getElementById('checkAnswerBtn').style.display = 'none'; // Ẩn nút "Kiểm tra câu trả lời"
+            document.getElementById('result').innerText = `Bạn đã hoàn thành tất cả các câu hỏi! 
+                Đúng: ${correctAnswers} 
+                Sai: ${incorrectAnswers}`;
+
+            // Lấy tên chủ đề từ HTML
+            const topic = document.getElementById('topic').innerText.replace('Chủ đề: ', '');
+
+            // Thời gian kết thúc luyện tập
+            let endTime = new Date().toISOString();
+
+            // Gửi thông tin về số câu đúng, số câu sai, thời gian bắt đầu và kết thúc lên server
+            savePracticeHistoryToServer({
+                user_id: userId,
+                topic: topic,
+                correctAnswers: correctAnswers,
+                incorrectAnswers: incorrectAnswers,
+                startTime: startTime,
+                endTime: endTime
+            });
+        }
+
+        async function savePracticeHistoryToServer(data) {
+            try {
+                const response = await fetch('save_practice_history.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),
+                });
+                const result = await response.text();
+                console.log(result); // Hiển thị thông báo từ server
+            } catch (error) {
+                console.error('Lỗi khi lưu thông tin lịch sử luyện tập:', error);
+            }
+        }
+
+        document.getElementById('checkAnswerBtn').addEventListener('click', () => {
+            // Lấy đáp án mà học sinh nhập vào từ blockly
+            const answerBlock = workspace.getAllBlocks().find(block => block.type === 'math_number');
+            if (!answerBlock) {
+                alert('Không tìm thấy block đáp án');
+                return;
+            }
+            const userAnswer = parseInt(answerBlock.getFieldValue('NUM'), 10);
+            console.log("User answer:", userAnswer); // Log đáp án của người dùng
+
+            // Lấy đáp án từ SQL
+            const problem = problems[currentQuestionIndex];
+            const correctAnswer = parseInt(problem.answer, 10); // Đảm bảo rằng correctAnswer là số
+            console.log("Correct answer:", correctAnswer); // Log đáp án đúng
+
+            // So sánh đáp án mà học sinh nhập vào với đáp án từ SQL
+            try {
+                if (userAnswer === correctAnswer) {
+                    document.getElementById('result').innerText = 'Chính xác, bạn giỏi quá!';
+                    correctAnswers++;
+                } else {
+                    document.getElementById('result').innerText = 'Tiếc quá, bạn trả lời sai rồi!';
+                    incorrectAnswers++;
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = 'Có lỗi xảy ra trong quá trình kiểm tra câu trả lời.';
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < problems.length) {
+                loadQuestion(currentQuestionIndex);
+            } else {
+                showCompletionMessage();
+            }
+        });
+    </script>
+</body>
+</html>
