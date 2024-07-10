@@ -1,0 +1,21 @@
+# Composer vendor directory
+/vendor/
+
+# Composer lock file
+/composer.lock
+
+# Node modules directory
+/node_modules/
+
+# Environment variables file
+/.env
+
+# Log files
+*.log
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+/tmp/
