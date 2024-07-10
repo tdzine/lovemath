@@ -1,8 +1,9 @@
 <?php
-$servername = "localhost"; // Sử dụng "localhost"
-$username = "root"; // Thay đổi tên đăng nhập của bạn nếu cần
-$password = ""; // Thay đổi mật khẩu của bạn nếu cần
-$dbname = "my_database"; // Thay đổi tên cơ sở dữ liệu của bạn
+// Kết nối đến cơ sở dữ liệu
+$servername = getenv('viaduct.proxy.rlwy.net');
+$username = getenv('root');
+$password = getenv('EMlgsirgeLBFYkJpAIbqzosXFnvCmHeG');
+$dbname = getenv('railway');
 
 // Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
@@ -11,4 +12,5 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Kết nối thất bại: " . $conn->connect_error);
 }
+echo "Kết nối thành công";
 ?>
