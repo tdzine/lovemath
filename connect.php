@@ -1,9 +1,14 @@
 <?php
-// Kết nối đến cơ sở dữ liệu
+// Lấy các biến môi trường
 $servername = getenv('viaduct.proxy.rlwy.net');
 $username = getenv('root');
 $password = getenv('EMlgsirgeLBFYkJpAIbqzosXFnvCmHeG');
 $dbname = getenv('railway');
+
+// Kiểm tra xem các biến môi trường đã được thiết lập hay chưa
+if (!$servername || !$username || !$password || !$dbname) {
+    die('Một hoặc nhiều biến môi trường không được thiết lập.');
+}
 
 // Tạo kết nối
 $conn = new mysqli($servername, $username, $password, $dbname);
